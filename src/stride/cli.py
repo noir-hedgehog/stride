@@ -22,7 +22,6 @@ from stride.ai import AIClient
 def cmd_run(args):
     import logging
     import os
-    import anthropic
 
     logging.basicConfig(
         level=logging.DEBUG if args.debug else logging.INFO,
@@ -31,19 +30,21 @@ def cmd_run(args):
     )
     logger = logging.getLogger(__name__)
 
-    api_key = args.api_key or os.environ.get("ANTHROPIC_API_KEY")
+    provider = args.provider or "anthropic"
+    api_key_env = f"{provider.upper()}_API_KEY"
+    api_key = args.api_key or os.environ.get(api_key_env)
     if not api_key:
-        logger.warning("ANTHROPIC_API_KEY not set — AI will return no-ops")
+        logger.warning(f"{api_key_env} not set — AI will return no-ops")
 
     world = WorldModel()
     sensors = SensorSuite()
     actors = ActorSuite()
-    ai = AIClient(api_key=api_key)
+    ai = AIClient(api_key=api_key, provider=provider)
 
     loop = FrameLoop(world_model=world, sensor_suite=sensors, actor_suite=actors, ai_client=ai)
     loop.FRAME_DURATION = args.frame_duration or 60
 
-    print(f"Stride starting — {args.max_frames or 'unlimited'} frames, {loop.FRAME_DURATION}s/frame")
+    print(f"Stride starting — provider={provider}, {args.max_frames or 'unlimited'} frames, {loop.FRAME_DURATION}s/frame")
     try:
         loop.run(max_frames=args.max_frames)
     except KeyboardInterrupt:
@@ -110,6 +111,7 @@ def main():
     run_parser.add_argument("--frame-duration", type=int, default=None)
     run_parser.add_argument("--debug", action="store_true")
     run_parser.add_argument("--api-key", type=str, default=None)
+    run_parser.add_argument("--provider", type=str, default=None, choices=["anthropic", "minimax"], help="AI provider (default: anthropic)")
     run_parser.set_defaults(func=cmd_run)
 
     sub.add_parser("status", help="Show world model status").set_defaults(func=cmd_status)

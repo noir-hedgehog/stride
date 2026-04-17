@@ -31,8 +31,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Stride — Real-Time Frame-Based Agent")
     parser.add_argument("--max-frames", type=int, default=None, help="Stop after N frames")
     parser.add_argument("--frame-duration", type=int, default=60, help="Frame duration in seconds")
-    parser.add_argument("--api-key", type=str, default=None, help="API key (uses ANTHROPIC_API_KEY or MINIMAX_API_KEY env)")
-    parser.add_argument("--provider", type=str, default="minimax", choices=["anthropic", "minimax"], help="AI provider (default: minimax)")
+    parser.add_argument("--api-key", type=str, default=None, help="Anthropic API key (or set ANTHROPIC_API_KEY env)")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     parser.add_argument("--version", action="store_true", help="Print version and exit")
     return parser.parse_args()
@@ -48,25 +47,19 @@ def main():
     setup_logging(level=logging.DEBUG if args.debug else logging.INFO)
     logger = logging.getLogger(__name__)
 
-    api_key = args.api_key
-    if not api_key:
-        if args.provider == "minimax":
-            api_key = os.environ.get("MINIMAX_API_KEY")
-        else:
-            api_key = os.environ.get("ANTHROPIC_API_KEY")
+    api_key = args.api_key or os.environ.get("ANTHROPIC_API_KEY")
 
     if not api_key:
-        logger.warning(f"{args.provider.upper()}_API_KEY not set — AI decisions will be no-ops")
+        logger.warning("ANTHROPIC_API_KEY not set — AI decisions will be no-ops")
 
     # Wire up components
     logger.info(f"Stride v{__version__} starting")
     logger.info(f"Frame duration: {args.frame_duration}s")
-    logger.info(f"Provider: {args.provider}")
 
     world_model = WorldModel()
     sensors = SensorSuite()
     actors = ActorSuite()
-    ai = AIClient(provider=args.provider, api_key=api_key)
+    ai = AIClient(api_key=api_key)
 
     loop = FrameLoop(
         world_model=world_model,

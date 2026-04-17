@@ -4,4 +4,5 @@ ai
 loop
 main
 sensors
+stride
 world_model
