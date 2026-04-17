@@ -1,0 +1,14 @@
+pyproject.toml
+src/__init__.py
+src/loop.py
+src/main.py
+src/world_model.py
+src/actors/__init__.py
+src/ai/__init__.py
+src/sensors/__init__.py
+src/stride.egg-info/PKG-INFO
+src/stride.egg-info/SOURCES.txt
+src/stride.egg-info/dependency_links.txt
+src/stride.egg-info/requires.txt
+src/stride.egg-info/top_level.txt
+tests/test_loop.py

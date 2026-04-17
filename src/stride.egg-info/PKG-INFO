@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: stride
+Version: 0.1.0
+Summary: Real-time frame-based agent
+Requires-Python: >=3.10
+Requires-Dist: anthropic>=0.25.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
